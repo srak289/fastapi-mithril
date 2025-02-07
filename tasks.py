@@ -5,6 +5,7 @@ from pathlib import Path
 from hashlib import sha256
 
 fp_conf_hash = Path("oci/nginx/.nginx.conf.sha256")
+fp_cf_hash = Path("oci/nginx/.Containerfile.sha256")
 d_content = None
 
 @task
@@ -24,31 +25,48 @@ def nginx_vol(c):
 @task
 def nginx_img(c):
     conf_hash = None
+    cf_hash = None
+
+    if fp_cf_hash.is_file():
+        cf_hash = fp_cf_hash.read_text()
+    cur_cf_hash = sha256(Path("oci/nginx/Containerfile").read_bytes()).hexdigest()
+
     if fp_conf_hash.is_file():
-        fp_conf_hash.read_text()
-    cur_conf_hash = sha256(Path("oci/nginx/nginx.conf").read_text())
-    if cur_conf_hash == conf_hash:
+        conf_hash = fp_conf_hash.read_text()
+    cur_conf_hash = sha256(Path("oci/nginx/nginx.conf").read_bytes()).hexdigest()
+
+    if (
+        cur_conf_hash == conf_hash
+        and cur_cf_hash == cf_hash
+    ):
         return
+    print("Mismatch!")
+    fp_cf_hash.write_text(cur_cf_hash)
     fp_conf_hash.write_text(cur_conf_hash)
     print("Regenerating nginx")
     c.run("podman build -t proxy:latest -f oci/nginx/Containerfile")
 
 @task(pre=[nginx_vol], aliases=["content"])
 def nginx_content(c):
+    if d_content == None:
+        print(f"ERROR: d_content is 'None'")
+        breakpoint()
     c.run(f"rsync --no-compress -a -d static/ {d_content}")
 
 @task(pre=[nginx_img, nginx_content], aliases=["proxy"])
 def nginx(c):
-    c.run("podman run -d --rm --name nginx "
-        "-v ./nginx.conf:/etc/nginx/nginx.conf:ro,Z "
-        "-v content:/usr/share/nginx/html:ro,Z "
-        "-v certs:/etc/ssl/subatomic:ro,Z "
+    r = c.run("podman ps -q -f name=nginx")
+    if r.stdout != "":
+        return
+    c.run("podman run -d --rm "
+        "--name nginx "
         "--network=host "
-        "docker.io/library/nginx:latest",
+        "-v content:/usr/share/nginx/html:ro,Z "
+        "localhost/proxy:latest",
         warn=True
     )
 
-@task(post=["nginx"])
+@task(post=[nginx])
 def restart(c):
     c.run("podman stop nginx", warn=True)
 
