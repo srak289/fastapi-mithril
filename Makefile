@@ -9,7 +9,7 @@ nginx-content: nginx-vol
 nginx: nginx-vol
 	podman run -d --rm --name nginx \
 		-v ./nginx.conf:/etc/nginx/nginx.conf:ro,Z \
-		-v content:/usr/share/nginx:ro,Z \
+		-v content:/usr/share/nginx/html:ro,Z \
 		--network=host \
 		docker.io/library/nginx:latest
 restart:
