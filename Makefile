@@ -6,7 +6,7 @@ nginx-content: nginx-vol
 	rsync --no-compress -a -d static/ $(VOL)
 
 
-nginx: nginx-vol
+nginx: nginx-content
 	podman run -d --rm --name nginx \
 		-v ./nginx.conf:/etc/nginx/nginx.conf:ro,Z \
 		-v content:/usr/share/nginx/html:ro,Z \
