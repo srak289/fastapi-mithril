@@ -1,0 +1,5 @@
+sqlalchemy[asyncio]
+fastapi[standard]
+psycopg-binary
+uvicorn
+invoke

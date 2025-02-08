@@ -75,6 +75,18 @@ def server(c):
     c.run("uvicorn --reload main:app", pty=True)
 
 @task
+def fetch_js(c):
+    for k, v in {
+        "mithril.min.js": "https://cdnjs.cloudflare.com/ajax/libs/mithril/2.2.12/mithril.min.js",
+        "cytoscape.esm.min.mjs": "https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.4/cytoscape.esm.min.mjs",
+    }.items():
+        if not Path(f"static/js/{k}").is_file():
+            print(f"Fetching {v}")
+            c.run(f"wget {v} -O static/js/{k}")
+        else:
+            print(f"Already fetched {k}")
+
+@task
 def postgres(c):
     c.run("""podman run -d --rm --name test 
 -e "POSTGRES_ADMIN=admin" 
