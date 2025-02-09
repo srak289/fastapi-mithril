@@ -32,7 +32,22 @@ let RootComponent = {
     }
 }
 
+let Graph = {
+    model: {},
+    fetch: function() {
+        m.request({
+            method: "GET",
+            url: "/api/v1/nodes",
+        })
+        .then(function(result) {
+            Graph.model = result
+        });
+    },
+}
+
+
 let CytoscapeComponent = {
+    oninit: Graph.fetch,
     view: function() {
         return m(LinksComponent, m("div", {class: "cytoscape-component"}, [
             m("div", {id: "cy", class: "cytoscape-canvas"}),
@@ -41,13 +56,7 @@ let CytoscapeComponent = {
     oncreate: function(vnode) {
         var cy = cytoscape({
             container: document.getElementById("cy"),
-            elements: [
-                { data: { id: "a" } },
-                { data: { id: "b" } },
-                { data: { id: "c" } },
-                { data: { id: "ab", source: "a", target: "b" } },
-                { data: { id: "ac", source: "a", target: "c" } },
-            ],
+            elements: Graph.model.elements,
             style: [
               {
                 selector: 'node',
