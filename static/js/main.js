@@ -47,14 +47,16 @@ let Graph = {
 
 
 let CytoscapeComponent = {
-    oninit: Graph.fetch,
+    cy: null,
     view: function() {
         return m(LinksComponent, m("div", {class: "cytoscape-component"}, [
             m("div", {id: "cy", class: "cytoscape-canvas"}),
+            m("button", {onclick: () => CytoscapeComponent.cy.fit()}, "Fit"),
         ]));
     },
+    oninit: Graph.fetch,
     oncreate: function(vnode) {
-        var cy = cytoscape({
+        CytoscapeComponent.cy = cytoscape({
             container: document.getElementById("cy"),
             elements: Graph.model.elements,
             style: [
@@ -74,6 +76,7 @@ let CytoscapeComponent = {
               }
             ],
             layout: { name: 'grid' },
+            wheelSensitivity: 0.05,
         });
     }   
 }
