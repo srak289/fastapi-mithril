@@ -1,16 +1,29 @@
 .links-bar {
     display: flex;
-    gap: 10px; /* Adds spacing between divs */
+    /*gap: 10px;*/
 }
 
 .links-item {
-    background: lightblue;
-    padding: 20px;
-    border: 1px solid #000;
+    background: linear-gradient(45deg, #8181de, #3a3ad6);
+    padding: 10px 50px;
+    border: 1px solid white;
+}
+
+.links-text {
+    color: white;
 }
 
 .body {
     width: 35em;
     margin: 0 auto;
-    font-family: Tahoma, Verdana, Arial, sans-serif;
+}
+
+* {
+    font-family: Arial, sans-serif;
+}
+
+.cytoscape-canvas {
+    width: 300px;
+    height: 300px;
+    background: #fefefe;
 }
