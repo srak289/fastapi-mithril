@@ -1,8 +1,6 @@
 FROM docker.io/library/nginx:latest
 
 COPY certs/cert.pem         /etc/ssl/certs/cert.pem
-COPY certs/chain.pem        /etc/ssl/certs/chain.pem
-COPY certs/fullchain.pem    /etc/ssl/certs/fullchain.pem
 COPY certs/privkey.pem      /etc/ssl/private/privkey.pem
 
 COPY nginx.conf /etc/nginx/nginx.conf
