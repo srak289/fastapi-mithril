@@ -3,19 +3,12 @@ import cytoscape from 'cytoscape';
 
 let root = document.body
 
-const pages = {
-    Root: "/",
-    Cytoscape: "/cy",
-    Users: "/users",
-    Login: "/login",
-}
-
 let LinksComponent = {
     view: function(vnode) {
         return m("div", {class: "main"}, [
             m("div", {class: "links-bar"}, Object.entries(pages).map(([k, v]) =>
-                m("div", {class: "links-item", onclick: () => m.route.set(v)},
-                    m("h3", {class: "links-text"}, k)
+                m("div", {class: "links-item", onclick: () => m.route.set(k)},
+                    m("h3", {class: "links-text"}, v.title)
                 )
             )),
             vnode.children
@@ -24,6 +17,7 @@ let LinksComponent = {
 }
 
 let RootComponent = {
+    title: "Root",
     view: function() {
         return m(LinksComponent, m("div", {class: "root-component"}, [
             m("h1", {class: "root-component-title"}, "Test"),
@@ -46,6 +40,7 @@ let Graph = {
 }
 
 let CytoscapeComponent = {
+    title: "Cytoscape",
     cy: null,
     dblClickHandler(evt) {
         evt.cy.animate({
@@ -86,7 +81,7 @@ let CytoscapeComponent = {
                 }
               }
             ],
-            layout: { name: 'circle' },
+            layout: { name: 'cose' },
             wheelSensitivity: 0.05,
         });
         CytoscapeComponent.cy.on("vdblclick", CytoscapeComponent.dblClickHandler);
@@ -94,6 +89,7 @@ let CytoscapeComponent = {
 }
 
 let UsersComponent = {
+    title: "Users",
     view: function() {
         return m(LinksComponent, m("div", {class: "users-component"}, [
             m("h1", {class: "users-component-title"}, "Users"),
@@ -102,6 +98,7 @@ let UsersComponent = {
 }
 
 let LoginComponent = {
+    title: "Login",
     view: function() {
         return m(LinksComponent, m("div", {class: "login-component"}, [
             m("h1", {class: "login-component-title"}, "Login"),
@@ -110,9 +107,11 @@ let LoginComponent = {
 }
 
 
-m.route(root, "/", {
+let pages = {
     "/": RootComponent,
     "/cy": CytoscapeComponent,
     "/users": UsersComponent,
     "/login": LoginComponent,
-})
+}
+
+m.route(root, "/", pages);
