@@ -16,12 +16,12 @@ let LinksComponent = {
     }
 }
 
-let RootComponent = {
-    title: "Root",
+let MainComponent = {
+    title: "Home",
     view: function() {
-        return m(LinksComponent, m("div", {class: "root-component"}, [
-            m("h1", {class: "root-component-title"}, "Test"),
-            m("p", {class: "root-component-content"}, "This is content"),
+        return m(LinksComponent, m("div", {class: "home-component"}, [
+            m("h1", {class: "home-component-title"}, "Welcome"),
+            m("p", {class: "home-component-content"}, "Click the Cytoscape tab to view a graph"),
         ]));
     }
 }
@@ -49,19 +49,7 @@ let CytoscapeComponent = {
             easing: 'ease-in-out',
         });
     },
-    view: function() {
-        return m(LinksComponent, m("div", {class: "cytoscape-component"}, [
-            m("div", {id: "cy", class: "cytoscape-canvas"}),
-            m("button", {onclick: () => CytoscapeComponent.cy.animate({
-                fit: { padding: 20 },
-                duration: 500,
-                easing: 'ease-in-out',
-            })}, "Fit"),
-            m("p", "Double-click to zoom to a node"),
-        ]));
-    },
-    oninit: Graph.fetch,
-    oncreate: function(vnode) {
+    setup() {
         CytoscapeComponent.cy = cytoscape({
             container: document.getElementById("cy"),
             elements: Graph.model.elements,
@@ -81,37 +69,43 @@ let CytoscapeComponent = {
                 }
               }
             ],
-            layout: { name: 'cose' },
+            layout: { name: 'cose', animated: false },
             wheelSensitivity: 0.05,
         });
         CytoscapeComponent.cy.on("vdblclick", CytoscapeComponent.dblClickHandler);
-    }   
-}
-
-let UsersComponent = {
-    title: "Users",
+    },
     view: function() {
-        return m(LinksComponent, m("div", {class: "users-component"}, [
-            m("h1", {class: "users-component-title"}, "Users"),
+        return m(LinksComponent, m("div", {class: "cytoscape-component"}, [
+            m("div", {id: "cy", class: "cytoscape-canvas"}),
+            m("button", {onclick: () => CytoscapeComponent.cy.animate({
+                fit: { padding: 20 },
+                duration: 500,
+                easing: 'ease-in-out',
+            })}, "Fit"),
+            m("button", {onclick: () => {
+                CytoscapeComponent.cy.elements().remove();
+                CytoscapeComponent.setup();
+            }}, "Redraw"),
+            m("button", {onclick: () => {
+                CytoscapeComponent.cy.elements().remove();
+                Graph.fetch();
+                CytoscapeComponent.setup();
+            }}, "Renew"),
+            m("p", "Double-click to zoom to a node"),
         ]));
+    },
+    oninit: Graph.fetch,
+    oncreate: function() {
+        CytoscapeComponent.setup();
+    },
+    onbeforeremove: function() {
+        CytoscapeComponent.cy.destroy();
     }
 }
-
-let LoginComponent = {
-    title: "Login",
-    view: function() {
-        return m(LinksComponent, m("div", {class: "login-component"}, [
-            m("h1", {class: "login-component-title"}, "Login"),
-        ]));
-    }
-}
-
 
 let pages = {
-    "/": RootComponent,
+    "/": MainComponent,
     "/cy": CytoscapeComponent,
-    "/users": UsersComponent,
-    "/login": LoginComponent,
 }
 
 m.route(root, "/", pages);

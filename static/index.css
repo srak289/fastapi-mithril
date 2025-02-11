@@ -23,7 +23,7 @@
 }
 
 .cytoscape-canvas {
-    width: 500px;
-    height: 500px;
+    width: 100vw;
+    height: 100vw;
     background: #f3f3f3;
 }

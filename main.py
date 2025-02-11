@@ -61,9 +61,12 @@ def nodes():
             if Node(n) not in graph.nodes:
                 break
         graph.add_node(n)
+        print(f"Added node {n}")
 
     for e in range(10, random.randint(10,30)):
         while 1:
+            if len(graph.nodes) == 0:
+                breakpoint()
             s = random.choice(graph.nodes)
             t = random.choice(graph.nodes)
             if s != t:
