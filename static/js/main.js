@@ -45,35 +45,24 @@ let Graph = {
     },
 }
 
-let DblClickHandler = {
-    vDblClickTable: {},
-    call: function(evt) {
-        console.log(`Received ${evt}`);
-        if(!DblClickHandler.vDblClickTable.hasOwnProperty(evt.target)) {
-            evt.cy.animate({
-                fit: {
-                    eles: evt.target,
-                    padding: 20
-                },
-                duration: 500,
-                easing: 'ease-in-out',
-            });
-        }
-    }
-}
-
 let CytoscapeComponent = {
     cy: null,
+    dblClickHandler(evt) {
+        evt.cy.animate({
+            fit: {eles: evt.target, padding: 50},
+            duration: 500,
+            easing: 'ease-in-out',
+        });
+    },
     view: function() {
         return m(LinksComponent, m("div", {class: "cytoscape-component"}, [
             m("div", {id: "cy", class: "cytoscape-canvas"}),
-            m("button", {onclick: () => {
-                CytoscapeComponent.cy.animate({
-                    fit: { padding: 20 },
-                    easing: 'ease-in-out',
-                    duration: 500,
-                })
-            }}, "Fit"),
+            m("button", {onclick: () => CytoscapeComponent.cy.animate({
+                fit: { padding: 20 },
+                duration: 500,
+                easing: 'ease-in-out',
+            })}, "Fit"),
+            m("p", "Double-click to zoom to a node"),
         ]));
     },
     oninit: Graph.fetch,
@@ -100,7 +89,7 @@ let CytoscapeComponent = {
             layout: { name: 'circle' },
             wheelSensitivity: 0.05,
         });
-        CytoscapeComponent.cy.on("vdblclick", DblClickHandler.call);
+        CytoscapeComponent.cy.on("vdblclick", CytoscapeComponent.dblClickHandler);
     }   
 }
 
